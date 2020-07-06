@@ -1,3 +1,5 @@
+[![Maintainability](https://api.codeclimate.com/v1/badges/8c373b129355be2e348d/maintainability)](https://codeclimate.com/github/sergeevpasha/laravel-pecom/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/8c373b129355be2e348d/test_coverage)](https://codeclimate.com/github/sergeevpasha/laravel-pecom/test_coverage)
 [![CodeFactor](https://www.codefactor.io/repository/github/sergeevpasha/laravel-pecom/badge)](https://www.codefactor.io/repository/github/sergeevpasha/laravel-pecom)
 [![Generic badge](https://img.shields.io/badge/PHP-^7.4.*-blue.svg)](https://www.php.net)
 [![Generic badge](https://img.shields.io/badge/Laravel-^6.0-red.svg)](https://laravel.com)
@@ -73,23 +75,23 @@ Delivery::fromArray([
         'arrival_service.elevator'    => '1', // Boolean, if there is an elevator
     ],
     'derival_service'                 => [    
-        'enabled'     => '0', // Enable additional service on derival
-        'floor'       => '10', // Pickup floor
-        'distance'    => '10', // Pickup Distance in Meters
-        'elevator'    => '1', // Boolean, if there is an elevator
+        'enabled'                     => '0', // Enable additional service on derival
+        'floor'                       => '10', // Pickup floor
+        'distance'                    => '10', // Pickup Distance in Meters
+        'elevator'                    => '1', // Boolean, if there is an elevator
     ]
     /* --- */
     'cargo'                           => [ // It's an array of arrays with cargo data
       [
-          'width'                       => '1', // Width in Meters
-          'height'                      => '1', // Height in Meters
-          'weight'                      => '1', // Weight in KG
-          'volume'                      => '1', // Weight in M<sup>3</sup>
-          'max_size'                    => '1', // Max dimension size in Meters
+          'width'                     => '1', // Width in Meters
+          'height'                    => '1', // Height in Meters
+          'weight'                    => '1', // Weight in KG
+          'volume'                    => '1', // Weight in M<sup>3</sup>
+          'max_size'                  => '1', // Max dimension size in Meters
           /* Next fileds are not required */
-          'protective_package'          => '1', // Boolean, if you need a protective package
-          'total_sealing_positions'     => '4', // Total sealing positions
-          'oversized'                   => '1', // Boolean, if cargo is oversized
+          'protective_package'        => '1', // Boolean, if you need a protective package
+          'total_sealing_positions'   => '4', // Total sealing positions
+          'oversized'                 => '1', // Boolean, if cargo is oversized
           /* --- */
       ]
     ]
