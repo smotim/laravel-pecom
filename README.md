@@ -2,7 +2,7 @@
 [![Test Coverage](https://api.codeclimate.com/v1/badges/8c373b129355be2e348d/test_coverage)](https://codeclimate.com/github/sergeevpasha/laravel-pecom/test_coverage)
 [![CodeFactor](https://www.codefactor.io/repository/github/sergeevpasha/laravel-pecom/badge)](https://www.codefactor.io/repository/github/sergeevpasha/laravel-pecom)
 [![Generic badge](https://img.shields.io/badge/PHP-^7.4.*-blue.svg)](https://www.php.net)
-[![Generic badge](https://img.shields.io/badge/Laravel-^6.0-red.svg)](https://laravel.com)
+[![Generic badge](https://img.shields.io/badge/Laravel-^7.0-red.svg)](https://laravel.com)
 
 # Laravel PECOM API Wrapper
 Allows you to:
