@@ -17,17 +17,21 @@ class PecomController
      *
      * @var \SergeevPasha\Pecom\Libraries\PecomClient
      */
-    private $client;
+    private PecomClient $client;
 
     public function __construct(PecomClient $client)
     {
         $this->client = $client;
     }
-    
+
     /**
      * Query City.
      *
+     * @api
+     *
      * @param \SergeevPasha\Pecom\Http\Requests\PecomQueryCityRequest $request
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
      * @return \Illuminate\Http\JsonResponse
      */
     public function queryCity(PecomQueryCityRequest $request): JsonResponse
@@ -35,9 +39,13 @@ class PecomController
         $data['data'] = $this->client->findCity($request->query('query'));
         return response()->json($data);
     }
-     
+
     /**
      * Get city terminals.
+     *
+     * @api
+     *
+     * @param int $city
      *
      * @return \Illuminate\Http\JsonResponse
      */
@@ -46,11 +54,15 @@ class PecomController
         $data['data'] = $this->client->getCityTerminals($city);
         return response()->json($data);
     }
-    
+
     /**
      * Calculate delivery.
      *
+     * @api
+     *
      * @param \SergeevPasha\Pecom\Http\Requests\PecomCalculatePriceRequest $request
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
      * @return \Illuminate\Http\JsonResponse
      */
     public function calculateDeliveryPrice(PecomCalculatePriceRequest $request): JsonResponse

@@ -16,7 +16,7 @@ class PecomClient
      * @var string
      */
     private string $user;
-    
+
     /**
      * Pecom App key.
      *
@@ -24,28 +24,38 @@ class PecomClient
      */
     private string $key;
 
+    /**
+     * PecomClient constructor.
+     *
+     * @param string|null $user
+     * @param string|null $key
+     *
+     * @throws \Exception
+     */
     public function __construct(?string $user, ?string $key)
     {
         if (!$user || !$key) {
             throw new Exception(trans('pecom::messages.missed_auth_data'));
         }
         $this->user = $user;
-        $this->key = $key;
+        $this->key  = $key;
     }
-    
+
     /**
-    * Send request to Pecom API.
-    *
-    * @param string $path
-    * @param array<mixed>  $params
-    * @param string $method
-    * @throws \Exception
-    * @return array<mixed>|null
-    */
+     * Send request to Pecom API.
+     *
+     * @param string       $path
+     * @param array<mixed> $params
+     * @param string       $method
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Exception
+     * @return array<mixed>|null
+     */
     public function request(string $path, array $params = [], string $method = 'POST'): ?array
     {
         try {
-            $options = [
+            $options  = [
                 'auth'        => [
                     $this->user,
                     $this->key
@@ -53,7 +63,7 @@ class PecomClient
                 'json'        => $params,
                 'http_errors' => false,
             ];
-            $client = new \GuzzleHttp\Client();
+            $client   = new \GuzzleHttp\Client();
             $response = $client->request($method, $path, $options);
         } catch (Exception $e) {
             throw new Exception(trans('pecom::messages.connection_fail'));
@@ -61,22 +71,21 @@ class PecomClient
         return json_decode($response->getBody()->getContents(), true);
     }
 
-
     /**
-     * Find a city by query string.
+     * Get extended city data by query string.
      *
      * @param string $query
      *
      * @return array<mixed>
      */
-    public function findCity(string $query): array
+    public function getExtendedCityData(string $query): array
     {
         $contents = json_decode(file_get_contents(__DIR__ . '/../data/pecom.json'));
-        $city = [];
+        $city     = [];
         foreach ($contents->branches as $region) {
             $findCity = array_filter(
                 $region->cities,
-                fn ($regionCity) => strpos(mb_strtolower($regionCity->title), mb_strtolower($query)) !== false
+                fn($regionCity) => strpos(mb_strtolower($regionCity->title), mb_strtolower($query)) !== false
             );
             if (!empty($findCity)) {
                 if (is_array($findCity)) {
@@ -89,7 +98,24 @@ class PecomClient
         usort($city, fn($a, $b) => $a->bitrixId > $b->bitrixId ? 1 : 0);
         return (array) $city;
     }
-    
+
+    /**
+     * Find a city by query string.
+     *
+     * @param string $query
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @return array<mixed>
+     */
+    public function findCity(string $query): array
+    {
+        $data = $this->request('https://kabinet.pecom.ru/api/v1/branches/findbytitle', [
+            'title' => $query,
+            'exact' => false
+        ]);
+        return $data['items'];
+    }
+
     /**
      * Find all available city terminals
      *
@@ -100,27 +126,27 @@ class PecomClient
     public function getCityTerminals(int $cityId): ?array
     {
         $contents = json_decode(file_get_contents(__DIR__ . '/../data/pecom.json'));
-        $city = [];
+        $city     = [];
         foreach ($contents->branches as $region) {
-            $findCity = array_filter($region->cities, fn ($regionCity) => (int) $regionCity->bitrixId === $cityId);
+            $findCity = array_filter($region->cities, fn($regionCity) => (int) $regionCity->bitrixId === $cityId);
             if (!empty($findCity)) {
                 $city = $findCity;
                 break;
             }
         }
-        $city = array_pop($city);
+        $city      = array_pop($city);
         $terminals = [];
         if ($city->divisions) {
             foreach ($city->divisions as $division) {
                 foreach ($contents->branches as $region) {
                     $findCity = array_filter(
                         $region->cities,
-                        fn ($regionCity) => (int) $regionCity->bitrixId === $cityId
+                        fn($regionCity) => (int) $regionCity->bitrixId === $cityId
                     );
                     if (!empty($findCity)) {
-                        $found = array_filter(
+                        $found       = array_filter(
                             $region->divisions,
-                            fn ($regionDivision) => $regionDivision->id === $division
+                            fn($regionDivision) => $regionDivision->id === $division
                         );
                         $terminals[] = array_pop($found);
                     }
@@ -129,11 +155,13 @@ class PecomClient
         }
         return (array) $terminals;
     }
-    
+
     /**
      * Get calculated price.
      *
      * @param \SergeevPasha\Pecom\DTO\Delivery $delivery
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
      * @return array<mixed>
      */
     public function getPrice(Delivery $delivery): array
@@ -168,11 +196,12 @@ class PecomClient
         ];
         return $this->request('https://kabinet.pecom.ru/api/v1/calculator/calculateprice', $request);
     }
-    
+
     /**
      * Build Cargo Array for the request
      *
      * @param \SergeevPasha\Pecom\DTO\Collection\CargoCollection $cargoCollection
+     *
      * @return array<mixed>
      */
     private function buildCargo(CargoCollection $cargoCollection): array
