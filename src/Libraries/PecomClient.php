@@ -109,11 +109,18 @@ class PecomClient
      */
     public function findCity(string $query): array
     {
-        $data = $this->request('https://kabinet.pecom.ru/api/v1/branches/findbytitle', [
-            'title' => $query,
-            'exact' => false
-        ]);
-        return $data['items'];
+        $data = $this->request(
+            'https://kabinet.pecom.ru/api/v1/branches/findbytitle',
+            [
+                'title' => $query,
+                'exact' => false
+            ]
+        );
+        if ($data) {
+            return $data['items'];
+        } else {
+            return [];
+        }
     }
 
     /**
@@ -162,9 +169,9 @@ class PecomClient
      * @param \SergeevPasha\Pecom\DTO\Delivery $delivery
      *
      * @throws \GuzzleHttp\Exception\GuzzleException
-     * @return array<mixed>
+     * @return array<mixed>|null
      */
-    public function getPrice(Delivery $delivery): array
+    public function getPrice(Delivery $delivery): ?array
     {
         $request = [
             'senderCityId'         => $delivery->derivalCityId,
