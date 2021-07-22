@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace SergeevPasha\Pecom\Http\Controllers;
 
+use Exception;
 use Illuminate\Http\JsonResponse;
 use SergeevPasha\Pecom\DTO\Delivery;
+use Illuminate\Support\Facades\Validator;
 use SergeevPasha\Pecom\Libraries\PecomClient;
+use Illuminate\Validation\ValidationException;
 use SergeevPasha\Pecom\Http\Requests\PecomQueryCityRequest;
 use SergeevPasha\Pecom\Http\Requests\PecomCalculatePriceRequest;
 
@@ -22,6 +25,30 @@ class PecomController
     public function __construct(PecomClient $client)
     {
         $this->client = $client;
+    }
+
+    /**
+     * Validate Pecom response
+     *
+     * @param array|null $data
+     *
+     * @throws \Exception
+     * @return void
+     */
+    public function validateResponse(?array $data): void
+    {
+        $validator = Validator::make([], []);
+
+        if (isset($data['error'])) {
+            if (isset($data['error']['fields'])) {
+                foreach ($data['error']['fields'] as $pecomFields) {
+                    $messages = is_array($pecomFields['Value']) ? trim(implode('. ', $pecomFields['Value'])) : $pecomFields['Value'];
+                    $validator->errors()->add($pecomFields['Key'], $messages);
+                }
+                throw new ValidationException($validator);
+            }
+            throw new Exception('Input data is invalid');
+        }
     }
 
     /**
@@ -62,12 +89,14 @@ class PecomController
      *
      * @param \SergeevPasha\Pecom\Http\Requests\PecomCalculatePriceRequest $request
      *
+     * @throws \Exception
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @return \Illuminate\Http\JsonResponse
      */
     public function calculateDeliveryPrice(PecomCalculatePriceRequest $request): JsonResponse
     {
         $data = $this->client->getPrice(Delivery::fromArray($request->all()));
+        $this->validateResponse($data);
         return response()->json($data);
     }
 }
