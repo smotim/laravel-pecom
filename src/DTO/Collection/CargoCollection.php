@@ -5,17 +5,12 @@ declare(strict_types=1);
 namespace SergeevPasha\Pecom\DTO\Collection;
 
 use SergeevPasha\Pecom\DTO\Cargo;
-use Spatie\DataTransferObject\DataTransferObjectCollection;
+use Illuminate\Support\Collection;
 
-final class CargoCollection extends DataTransferObjectCollection
+class CargoCollection extends Collection
 {
-    public function current(): Cargo
-    {
-        return parent::current();
-    }
-
     /**
-     * @param array<mixed> $data
+     * @param array $data
      *
      * @return self
      */
@@ -24,5 +19,10 @@ final class CargoCollection extends DataTransferObjectCollection
         return new static(
             array_map(fn($item) => Cargo::fromArray($item), $data)
         );
+    }
+
+    public function offsetGet($key): Cargo
+    {
+        return parent::offsetGet($key);
     }
 }
