@@ -30,6 +30,31 @@ class PecomTrack extends DataTransferObject
     public ?Carbon $receiveDate;
 
     /**
+     * @var string|null
+     */
+    public ?string $derivalCity;
+
+    /**
+     * @var string|null
+     */
+    public ?string $derivalTerminalAddress;
+
+    /**
+     * @var string|null
+     */
+    public ?string $arrivalCity;
+
+    /**
+     * @var string|null
+     */
+    public ?string $arrivalTerminalAddress;
+
+    /**
+     * @var float|null
+     */
+    public ?float $price;
+
+    /**
      * From Array.
      *
      * @param array $data
@@ -39,28 +64,43 @@ class PecomTrack extends DataTransferObject
      */
     public static function fromArray(array $data): self
     {
-        $cargoInfo = $data['cargos'][0]['info'] ?? [];
+        $cargo    = $data['cargos'][0] ?? [];
+        $info     = $cargo['info'] ?? [];
+        $sender   = $cargo['sender'] ?? [];
+        $receiver = $cargo['receiver'] ?? [];
+        $services = $cargo['services'] ?? [];
 
-        $status = $cargoInfo['cargoStatus'] ?? null;
-        $orderId = $data['cargos'][0]['cargo']['code'] ?? '';
-        $link = $orderId ? 'https://pecom.ru/services-are/order-status/?code=' . $orderId : '';
+        $status  = $info['cargoStatus'] ?? null;
+        $orderId = $cargo['cargo']['code'] ?? '';
+        $link    = $orderId ? 'https://pecom.ru/services-are/order-status/?code=' . $orderId : '';
 
-
-        $startDate = isset($cargoInfo['takeOnStockDateTime'])
-            ? Carbon::parse($cargoInfo['takeOnStockDateTime'])
+        $startDate = isset($info['takeOnStockDateTime'])
+            ? Carbon::parse($info['takeOnStockDateTime'])
             : null;
 
-        $receiveDate = isset($cargoInfo['receivedByClientDateTime'])
-            ? Carbon::parse($cargoInfo['receivedByClientDateTime'])
-            : (isset($cargoInfo['giveOutDateTime'])
-                ? Carbon::parse($cargoInfo['giveOutDateTime'])
+        $receiveDate = isset($info['receivedByClientDateTime'])
+            ? Carbon::parse($info['receivedByClientDateTime'])
+            : (isset($info['giveOutDateTime'])
+                ? Carbon::parse($info['giveOutDateTime'])
                 : null);
 
+        $derivalCity            = $sender['branchInfo']['city'] ?? null;
+        $derivalTerminalAddress = $sender['branchInfo']['address'] ?? null;
+        $arrivalCity            = $receiver['branch']['city'] ?? null;
+        $arrivalTerminalAddress = $receiver['branch']['address'] ?? null;
+
+        $price = isset($services['sum']) ? (float) $services['sum'] : null;
+
         return new self([
-            'status'            => $status,
-            'link'              => $link,
-            'startDate'         => $startDate,
-            'receiveDate'       => $receiveDate,
+            'status'                => $status,
+            'link'                  => $link,
+            'startDate'             => $startDate,
+            'receiveDate'           => $receiveDate,
+            'derivalCity'           => $derivalCity,
+            'derivalTerminalAddress' => $derivalTerminalAddress,
+            'arrivalCity'           => $arrivalCity,
+            'arrivalTerminalAddress' => $arrivalTerminalAddress,
+            'price'                 => $price,
         ]);
     }
 }

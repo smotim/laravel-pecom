@@ -137,7 +137,7 @@ class PecomClient
     public function findByTrackNumber(string $cargoCode): PecomTrack
     {
         $data = $this->request(
-            'https://kabinet.pecom.ru/api/v1/cargos/basicstatus',
+            'https://kabinet.pecom.ru/api/v1/cargos/status',
             [
                 'cargoCodes' => [$cargoCode],
             ]
