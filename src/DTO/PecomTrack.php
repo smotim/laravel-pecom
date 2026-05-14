@@ -55,6 +55,16 @@ class PecomTrack extends DataTransferObject
     public ?float $price;
 
     /**
+     * @var string|null
+     */
+    public ?string $deliveryType;
+
+    /**
+     * @var int|null
+     */
+    public ?int $deliveryDays;
+
+    /**
      * From Array.
      *
      * @param array $data
@@ -89,7 +99,11 @@ class PecomTrack extends DataTransferObject
         $arrivalCity            = $receiver['branch']['city'] ?? null;
         $arrivalTerminalAddress = $receiver['branch']['address'] ?? null;
 
-        $price = isset($services['sum']) ? (float) $services['sum'] : null;
+        $price        = isset($services['sum']) ? (float) $services['sum'] : null;
+        $deliveryType = $info['typeOfTransportation'] ?? null;
+        $deliveryDays = ($startDate && $receiveDate)
+            ? (int) $startDate->diffInDays($receiveDate)
+            : null;
 
         return new self([
             'status'                => $status,
@@ -100,7 +114,9 @@ class PecomTrack extends DataTransferObject
             'derivalTerminalAddress' => $derivalTerminalAddress,
             'arrivalCity'           => $arrivalCity,
             'arrivalTerminalAddress' => $arrivalTerminalAddress,
-            'price'                 => $price,
+            'price'                  => $price,
+            'deliveryType'           => $deliveryType,
+            'deliveryDays'           => $deliveryDays,
         ]);
     }
 }
