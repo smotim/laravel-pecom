@@ -126,12 +126,12 @@ class PecomTrack extends DataTransferObject
 
         $derivalCity            = $sender['branchInfo']['city'] ?? null;
         $derivalTerminalAddress = $sender['branchInfo']['address'] ?? null;
-        $derivalTerminalName    = $sender['branchInfo']['name'] ?? null;
         $arrivalCity            = $receiver['branch']['city'] ?? null;
         $arrivalTerminalAddress = $receiver['branch']['address'] ?? null;
-        $arrivalTerminalName    = $receiver['branch']['name'] ?? null;
 
-        $derivalIsTerminal = !empty($sender) ? !empty($sender['branchInfo']) : null;
+        // intakeAddress present only when door pickup was ordered
+        $intakeAddress     = $sender['intakeAddress'] ?? null;
+        $derivalIsTerminal = !empty($sender) ? empty($intakeAddress) : null;
         $arrivalIsTerminal = !empty($receiver) ? !empty($receiver['branch']) : null;
 
         $price        = isset($services['sum']) ? (float) $services['sum'] : null;
@@ -147,12 +147,10 @@ class PecomTrack extends DataTransferObject
             'receiveDate'            => $receiveDate,
             'derivalCity'            => $derivalCity,
             'derivalTerminalAddress' => $derivalTerminalAddress,
-            'derivalTerminalName'    => $derivalTerminalName,
-            'derivalAddressLine'     => $derivalTerminalAddress,
+            'derivalAddressLine'     => $intakeAddress ?: $derivalTerminalAddress,
             'derivalIsTerminal'      => $derivalIsTerminal,
             'arrivalCity'            => $arrivalCity,
             'arrivalTerminalAddress' => $arrivalTerminalAddress,
-            'arrivalTerminalName'    => $arrivalTerminalName,
             'arrivalAddressLine'     => $arrivalTerminalAddress,
             'arrivalIsTerminal'      => $arrivalIsTerminal,
             'price'                  => $price,
