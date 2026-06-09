@@ -62,6 +62,16 @@ class PecomTrack extends DataTransferObject
     /**
      * @var string|null
      */
+    public ?string $derivalApiTerminalId;
+
+    /**
+     * @var string|null
+     */
+    public ?string $arrivalApiTerminalId;
+
+    /**
+     * @var string|null
+     */
     public ?string $derivalAddressLine;
 
     /**
@@ -126,8 +136,17 @@ class PecomTrack extends DataTransferObject
 
         $derivalCity            = $sender['branchInfo']['city'] ?? null;
         $derivalTerminalAddress = $sender['branchInfo']['address'] ?? null;
+        $derivalTerminalName    = $sender['branchInfo']['name'] ?? null;
+        $derivalApiTerminalId   = isset($sender['branchInfo']['id'])
+            ? (string) $sender['branchInfo']['id']
+            : (isset($sender['branchInfo']['bitrixId']) ? (string) $sender['branchInfo']['bitrixId'] : null);
+
         $arrivalCity            = $receiver['branch']['city'] ?? null;
         $arrivalTerminalAddress = $receiver['branch']['address'] ?? null;
+        $arrivalTerminalName    = $receiver['branch']['name'] ?? null;
+        $arrivalApiTerminalId   = isset($receiver['branch']['id'])
+            ? (string) $receiver['branch']['id']
+            : (isset($receiver['branch']['bitrixId']) ? (string) $receiver['branch']['bitrixId'] : null);
 
         // intakeAddress present only when door pickup was ordered
         $intakeAddress     = $sender['intakeAddress'] ?? null;
@@ -147,10 +166,14 @@ class PecomTrack extends DataTransferObject
             'receiveDate'            => $receiveDate,
             'derivalCity'            => $derivalCity,
             'derivalTerminalAddress' => $derivalTerminalAddress,
+            'derivalTerminalName'    => $derivalTerminalName,
+            'derivalApiTerminalId'   => $derivalApiTerminalId,
             'derivalAddressLine'     => $intakeAddress ?: $derivalTerminalAddress,
             'derivalIsTerminal'      => $derivalIsTerminal,
             'arrivalCity'            => $arrivalCity,
             'arrivalTerminalAddress' => $arrivalTerminalAddress,
+            'arrivalTerminalName'    => $arrivalTerminalName,
+            'arrivalApiTerminalId'   => $arrivalApiTerminalId,
             'arrivalAddressLine'     => $arrivalTerminalAddress,
             'arrivalIsTerminal'      => $arrivalIsTerminal,
             'price'                  => $price,
